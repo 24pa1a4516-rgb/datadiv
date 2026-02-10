@@ -1,0 +1,10 @@
+{
+  "name": "farmer-transporter-root",
+  "version": "1.0.0",
+  "description": "Root proxy for logistics app",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "simulate": "cd backend && node simulate-transporters.js",
+    "test": "cd backend && node test-nearby.js"
+  }
+}

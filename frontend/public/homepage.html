@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriConnect</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0aa635">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f9fb;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      background: white;
+      margin: auto;
+      padding: 30px;
+      border-radius: 12px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: gray;
+      margin-bottom: 30px;
+    }
+
+    .roles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .role-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .role-card:hover {
+      border-color: #34c38f;
+    }
+
+    .role-card.selected {
+      border-color: #34c38f;
+      background: #ecfdf5;
+    }
+
+    .role-icon {
+      width: 40px;
+      height: 40px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .role-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .role-desc {
+      font-size: 14px;
+      color: gray;
+    }
+
+    .input-section {
+      margin-top: 30px;
+      display: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 16px;
+      background: #34c38f;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    button.enabled {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2 data-i18n="select_role">Select Your Role</h2>
+    <p class="subtitle" data-i18n="choose_agriconnect">Choose how you want to use AgriConnect</p>
+
+    <div class="roles">
+      <div class="role-card" data-role="Farmer">
+        <div class="role-icon">🌱</div>
+        <div class="role-title" data-i18n="farmer_role">Farmer</div>
+        <div class="role-desc" data-i18n="farmer_desc">
+          Manage crops, find transporters, track market prices
+        </div>
+      </div>
+
+      <div class="role-card" data-role="Transporter">
+        <div class="role-icon">🚚</div>
+        <div class="role-title" data-i18n="transporter_role">Transporter</div>
+        <div class="role-desc" data-i18n="transporter_desc">
+          Find pickup requests, optimize routes, manage deliveries
+        </div>
+      </div>
+
+      <div class="role-card" data-role="NGO">
+        <div class="role-icon">🤝</div>
+        <div class="role-title" data-i18n="ngo_role">NGO/Government</div>
+        <div class="role-desc" data-i18n="ngo_desc">
+          Support farmers and monitor agricultural activities
+        </div>
+      </div>
+    </div>
+
+    <!-- Name Input -->
+    <div class="input-section" id="nameSection">
+      <p><strong data-i18n="your_name">Your Name</strong></p>
+      <input type="text" id="username" data-i18n="fullname_placeholder" placeholder="Enter your full name">
+    </div>
+
+    <button id="continueBtn" data-i18n="continue" disabled>Continue</button>
+  </div>
+
+  <script>
+    let selectedRole = "";
+
+    const roleCards = document.querySelectorAll(".role-card");
+    const nameSection = document.getElementById("nameSection");
+    const continueBtn = document.getElementById("continueBtn");
+    const usernameInput = document.getElementById("username");
+
+    // Select role
+    roleCards.forEach(card => {
+      card.addEventListener("click", () => {
+        roleCards.forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+
+        selectedRole = card.dataset.role;
+        nameSection.style.display = "block";
+        checkEnable();
+      });
+    });
+
+    // Enable button only if name entered
+    usernameInput.addEventListener("input", checkEnable);
+
+    function checkEnable() {
+      if (selectedRole && usernameInput.value.trim() !== "") {
+        continueBtn.disabled = false;
+        continueBtn.classList.add("enabled");
+      } else {
+        continueBtn.disabled = true;
+        continueBtn.classList.remove("enabled");
+      }
+    }
+
+    // Continue button click
+    continueBtn.addEventListener("click", () => {
+      localStorage.setItem("username", usernameInput.value);
+      localStorage.setItem("role", selectedRole);
+
+      // ✅ REDIRECT
+      if (selectedRole === "Farmer") {
+        window.location.href = "farmer.html";
+      }
+      else if (selectedRole === "Transporter") {
+        window.location.href = "transport.html";
+      }
+      else if (selectedRole === "NGO") {
+        window.location.href = "NGOlogin.html";
+      }
+    });
+  </script>
+
+
+
+
+
+  <script src="lang.js"></script>
+  <script src="homepage.js"></script>
+</body>
+
+</html>

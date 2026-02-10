@@ -1,0 +1,281 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  // Dummy location for farmer (New Delhi)
+  const farmerLat = 28.6139;
+  const farmerLng = 77.2090;
+  const farmerRole = "farmer";
+  const farmerId = "farmer_web_" + Math.floor(Math.random() * 1000);
+
+  socket.on("connect", () => {
+    console.log("Connected as farmer:", farmerId);
+    socket.emit("join", { userId: farmerId, role: farmerRole });
+
+    // Request nearby transporters
+    requestNearby();
+  });
+
+  function requestNearby() {
+    socket.emit("getNearby", {
+      lat: farmerLat,
+      lng: farmerLng,
+      quantity: 500 // Example filter
+    });
+  }
+
+  socket.on("nearbyTransporters", (transporters) => {
+    console.log("Received nearby transporters:", transporters);
+    const mainContainer = document.querySelector(".main");
+
+    // Clear existing hardcoded cards (except the title)
+    const title = mainContainer.querySelector("h2");
+    const subtitle = mainContainer.querySelector("p");
+    mainContainer.innerHTML = "";
+    mainContainer.appendChild(title);
+    mainContainer.appendChild(subtitle);
+
+    if (transporters.length === 0) {
+      mainContainer.innerHTML += "<p>No transporters found within 50km with sufficient capacity.</p>";
+      return;
+    }
+
+    transporters.forEach(t => {
+      const card = `
+        <div class="transporter-card">
+          <div class="card-top">
+            <h3>${t.name || t.id}</h3>
+            <span class="available">${t.status}</span>
+          </div>
+          <div class="info">📍 ${t.distance.toFixed(1)} km away | 🚛 ${t.truckType || 'Truck'}</div>
+          <div class="info">📦 Capacity: ${t.capacity} quintals</div>
+          <div class="cost-box">
+            <span>Est. cost</span>
+            <b>₹${Math.round(t.distance * 25)}</b>
+          </div>
+          <div class="actions">
+            <a href="tel:+919876543210" class="call-btn">📞 Call</a>
+            <button class="pickup-btn" onclick="requestPickup('${t.id}')">Request Pickup</button>
+          </div>
+        </div>
+      `;
+      mainContainer.innerHTML += card;
+    });
+  });
+
+  function requestPickup(transporterId) {
+    fetch("/api/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        farmerId: farmerId,
+        lat: farmerLat,
+        lng: farmerLng,
+        quantity: 500,
+        crop: "Wheat"
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        alert("Request sent! ID: " + data.requestId);
+      });
+  }
+</script>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Nearby Transporters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f8f9;
+    }
+
+    .header {
+      background: white;
+      padding: 15px 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header select {
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .container {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: white;
+      padding: 20px;
+      border-right: 1px solid #e5e7eb;
+      min-height: calc(100vh - 70px);
+    }
+
+    .sidebar div {
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .sidebar .active {
+      background: #ecfdf5;
+      color: green;
+      font-weight: bold;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .transporter-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .available {
+      background: #dcfce7;
+      color: green;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .info {
+      margin-top: 10px;
+      color: #555;
+    }
+
+    .cost-box {
+      background: #f9fafb;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .call-btn {
+      border: 1px solid #cbd5e1;
+      background: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: black;
+    }
+
+    .pickup-btn {
+      flex: 1;
+      background: #0aa635;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div>
+      <h2 data-i18n="farmer_dashboard"></h2>
+      <p data-i18n="nearby_transporters"></p>
+    </div>
+
+    <!-- Language selector -->
+    <select id="languageSelect" onchange="setLang(this.value)">
+      <option value="English">English</option>
+      <option value="Telugu">తెలుగు</option>
+      <option value="Hindi">हिंदी</option>
+      <option value="Tamil">தமிழ்</option>
+      <option value="Kannada">ಕನ್ನಡ</option>
+      <option value="Malayalam">മലയാളം</option>
+    </select>
+  </div>
+
+  <div class="container">
+
+    <div class="sidebar">
+      <div onclick="goToCrops()" data-i18n="my_crops"></div>
+      <div class="active" data-i18n="community"></div>
+      <div data-i18n="transporters"></div>
+      <div data-i18n="market"></div>
+    </div>
+
+    <div class="main">
+      <h2 data-i18n="nearby_transporters"></h2>
+      <p data-i18n="gps_info"></p>
+
+      <!-- Transporter 1 -->
+      <div class="transporter-card">
+        <div class="card-top">
+          <h3>Raj Transport Services</h3>
+          <span class="available" data-i18n="available"></span>
+        </div>
+
+        <div class="info" data-i18n="distance1"></div>
+        <div class="info" data-i18n="truck1"></div>
+
+        <div class="cost-box">
+          <span data-i18n="estCost"></span>
+          <b>₹1250</b>
+        </div>
+
+        <div class="actions">
+          <a href="tel:+919876543210" class="call-btn" data-i18n="call"></a>
+          <button class="pickup-btn" onclick="requestPickup('Raj Transport Services')"
+            data-i18n="requestPickup"></button>
+        </div>
+      </div>
+
+      <!-- Transporter 2 -->
+      <div class="transporter-card">
+        <div class="card-top">
+          <h3>Kumar Logistics</h3>
+          <span class="available" data-i18n="available"></span>
+        </div>
+
+        <div class="info" data-i18n="distance2"></div>
+        <div class="info" data-i18n="truck2"></div>
+
+        <div class="cost-box">
+          <span data-i18n="estCost"></span>
+          <b>₹880</b>
+        </div>
+
+        <div class="actions">
+          <a href="tel:+919912345678" class="call-btn" data-i18n="call"></a>
+          <button class="pickup-btn" onclick="requestPickup('Kumar Logistics')" data-i18n="requestPickup"></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+
+</html>

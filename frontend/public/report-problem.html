@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Road Problem</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .media-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-media {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9fafb;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-media.active {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .preview {
+            width: 100%;
+            height: 200px;
+            background: #eee;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #1e5bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+        }
+
+        #audioStatus {
+            font-size: 12px;
+            color: #ef4444;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #1e5bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+        <h2>Report Road Issue</h2>
+        <p style="text-align: center; color: gray; font-size: 14px;">Your report will be shared with nearby transporters
+            and authorities.</p>
+
+        <div class="form-group">
+            <label>1. Capture Image</label>
+            <div class="preview" id="previewContainer">
+                <video id="video" autoplay playsinline
+                    style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
+                <img id="capturedImage" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                <span id="placeholderText">Camera not active</span>
+            </div>
+            <div class="media-buttons">
+                <button type="button" class="btn-media" id="startCameraBtn">📸 Open Camera</button>
+                <button type="button" class="btn-media" id="captureBtn"
+                    style="display: none; background: #fee2e2; border-color: #ef4444; color: #ef4444;">🎯
+                    Capture</button>
+                <button type="button" class="btn-media" id="retakeBtn" style="display: none;">🔄 Retake</button>
+            </div>
+            <canvas id="canvas" style="display: none;"></canvas>
+            <input type="file" id="imageInput" accept="image/*" capture="environment" style="display: none;">
+        </div>
+
+        <div class="form-group">
+            <label>2. Explain Problem (Audio)</label>
+            <div class="media-buttons">
+                <button id="recordBtn" class="btn-media">🎤 Record Voice</button>
+                <button id="stopBtn" class="btn-media" disabled>⏹ Stop</button>
+            </div>
+            <p id="audioStatus">🔴 Recording...</p>
+            <audio id="audioPlayback" controls style="width: 100%; display: none; margin-top: 10px;"></audio>
+        </div>
+
+        <div class="form-group">
+            <label>3. Describe (Text)</label>
+            <textarea id="description" rows="3" placeholder="Explain the road condition..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>4. Location</label>
+            <input type="text" id="locationText" placeholder="Fetching location..." readonly>
+        </div>
+
+        <button id="submitBtn" class="btn-submit">Report Road Problem</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="lang.js"></script>
+    <script src="report-problem.js"></script>
+</body>
+
+</html>

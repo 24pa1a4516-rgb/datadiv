@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Analytics - AgriConnect</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            background: #1e5bff;
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 25px;
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: -30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .stat-card h2 {
+            margin: 10px 0 0;
+            font-size: 24px;
+            color: #1e5bff;
+        }
+
+        .main-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .main-card h3 {
+            margin: 0 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .row:last-child {
+            border: none;
+        }
+
+        .label {
+            color: #555;
+        }
+
+        .value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .badge {
+            background: #eef4ff;
+            color: #1e5bff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .earnings-card {
+            background: linear-gradient(135deg, #1e5bff, #00d2ff);
+            color: white;
+            margin-top: 20px;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .earnings-card h4 {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .earnings-card h1 {
+            margin: 10px 0 0;
+            font-size: 36px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="dashboard.html" class="back-btn">←</a>
+        <h2 data-i18n="analytics">Analytics</h2>
+        <p>Performance Overview</p>
+    </div>
+
+    <div class="container">
+        <div class="grid">
+            <div class="stat-card">
+                <h4>Accepted</h4>
+                <h2 id="totalAccepted">0</h2>
+            </div>
+            <div class="stat-card">
+                <h4>Completed</h4>
+                <h2 id="totalCompleted">0</h2>
+            </div>
+        </div>
+
+        <div class="earnings-card">
+            <h4>Total Earnings</h4>
+            <h1 id="totalEarnings">₹0</h1>
+            <p style="font-size: 12px; margin-top: 10px; opacity: 0.9;">Total revenue from all completed trips</p>
+        </div>
+
+        <div class="main-card">
+            <h3>📊 Driver Rating</h3>
+            <div class="row">
+                <span class="label">Overall Rating</span>
+                <span class="value" style="color: #ffa000;">⭐ 4.8 / 5.0</span>
+            </div>
+            <div class="row">
+                <span class="label">Acceptance Rate</span>
+                <span class="value">98%</span>
+            </div>
+        </div>
+
+        <div class="main-card">
+            <h3>🕒 Weekly Summary</h3>
+            <div class="row">
+                <span class="label">Total Trips</span>
+                <span class="value" id="summaryTrips">0</span>
+            </div>
+            <div class="row">
+                <span class="label">Success Ratio</span>
+                <span class="value badge" id="successRatio">100%</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="lang.js"></script>
+    <script src="analytics.js"></script>
+</body>
+
+</html>

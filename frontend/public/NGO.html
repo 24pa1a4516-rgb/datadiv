@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>NGO Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f8f9;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 15px 30px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .header h2 {
+      margin: 0;
+    }
+
+    .header p {
+      color: gray;
+      margin-top: 5px;
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: white;
+      padding: 20px;
+      border-right: 1px solid #e5e7eb;
+      min-height: calc(100vh - 70px);
+    }
+
+    .sidebar div {
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .sidebar div:hover {
+      background: #f3f4f6;
+    }
+
+    .sidebar .active {
+      background: #eef2ff;
+      color: #4338ca;
+      font-weight: bold;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .report-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .report-card img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .report-info {
+      margin-top: 8px;
+      color: #444;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .pending {
+      background: #fef3c7;
+    }
+
+    .verified {
+      background: #ecfdf5;
+      color: green;
+    }
+
+    .resolved {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
+
+    .actions {
+      margin-top: 15px;
+    }
+
+    .actions button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .verify-btn {
+      background: #22c55e;
+      color: white;
+    }
+
+    .reject-btn {
+      background: #ef4444;
+      color: white;
+    }
+
+    .resolve-btn {
+      background: #3b82f6;
+      color: white;
+    }
+
+    /* ===== Creative Reports Styles ===== */
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .summary-card {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .summary-card h3 {
+      margin-bottom: 10px;
+      color: #555;
+    }
+
+    .summary-card h1 {
+      font-size: 36px;
+      margin: 0;
+    }
+
+    .summary-card.total {
+      border-top: 5px solid #6366f1;
+    }
+
+    .summary-card.pending {
+      border-top: 5px solid #f59e0b;
+    }
+
+    .summary-card.verified {
+      border-top: 5px solid #10b981;
+    }
+
+    .summary-card.resolved {
+      border-top: 5px solid #3b82f6;
+    }
+
+    .progress-box {
+      width: 100%;
+      height: 22px;
+      background: #e5e7eb;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #3b82f6, #6366f1);
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h2 data-i18n="ngo_role">NGO Dashboard</h2>
+    <p data-i18n="road_issue_center">Road Issue Verification Center</p>
+  </div>
+
+  <div class="container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="active" id="roadBtn" data-i18n="road_issues">🚧 Road Issues</div>
+      <div id="alertBtn" data-i18n="alerts">📢 Alerts</div>
+      <div id="reportBtn" data-i18n="analytics">📊 Reports</div>
+    </div>
+
+    <!-- Road Issues -->
+    <div class="main" id="roadSection"></div>
+
+    <!-- Alerts -->
+    <div class="main" id="alertsSection" style="display:none;">
+      <h2 data-i18n="alerts">📢 Alerts</h2>
+      <p data-i18n="urgent_problems">Urgent road problems reported by transporters.</p>
+    </div>
+
+    <!-- Reports (Creative) -->
+    <div class="main" id="reportsSection" style="display:none;">
+      <h2 data-i18n="road_reports_overview">📊 Road Issue Reports Overview</h2>
+      <p style="color:gray;" data-i18n="real_time_monitoring">Real-time monitoring of road complaints</p>
+    </div>
+
+    <div class="report-grid">
+      <div class="summary-card total">
+        <h3 data-i18n="total_complaints">Total Complaints</h3>
+        <h1 id="total">0</h1>
+      </div>
+      <div class="summary-card pending">
+        <h3 data-i18n="pending">Pending</h3>
+        <h1 id="pending">0</h1>
+      </div>
+      <div class="summary-card verified">
+        <h3 data-i18n="verified">Verified</h3>
+        <h1 id="verified">0</h1>
+      </div>
+      <div class="summary-card resolved">
+        <h3 data-i18n="resolved">Resolved</h3>
+        <h1 id="resolved">0</h1>
+      </div>
+    </div>
+
+    <h3 style="margin-top:30px;">Resolution Progress</h3>
+    <div class="progress-box">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p style="color:gray;">Percentage of resolved road issues</p>
+  </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const NGO_NAME = localStorage.getItem("ngoName") || "NGO User";
+    const NGO_ID = localStorage.getItem("userId") || "ngo_0000000000";
+
+    // Join room
+    socket.emit("join", { userId: NGO_ID, role: "ngo" });
+
+    // Listen for new issues
+    socket.on("newRoadIssue", (data) => {
+      console.log("Global road issue reported:", data);
+      fetchReports(); // Refresh list
+    });
+
+    socket.on("assignedIssue", (data) => {
+      alert("📦 IMPORTANT: " + data.message + "\nLocation: " + data.location);
+    });
+
+    let reports = [];
+
+    async function fetchReports() {
+      try {
+        const response = await fetch("/api/road-issues");
+        reports = await response.json();
+        renderReports();
+        updateReportStats();
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    const roadBtn = document.getElementById("roadBtn");
+    const alertBtn = document.getElementById("alertBtn");
+    const reportBtn = document.getElementById("reportBtn");
+
+    const roadSection = document.getElementById("roadSection");
+    const alertsSection = document.getElementById("alertsSection");
+    const reportsSection = document.getElementById("reportsSection");
+
+    function activate(btn) {
+      document.querySelectorAll(".sidebar div").forEach(d => d.classList.remove("active"));
+      btn.classList.add("active");
+    }
+
+    roadBtn.onclick = () => {
+      activate(roadBtn);
+      roadSection.style.display = "block";
+      alertsSection.style.display = "none";
+      reportsSection.style.display = "none";
+      renderReports();
+    };
+
+    alertBtn.onclick = () => {
+      activate(alertBtn);
+      roadSection.style.display = "none";
+      alertsSection.style.display = "block";
+      reportsSection.style.display = "none";
+    };
+
+    reportBtn.onclick = () => {
+      activate(reportBtn);
+      roadSection.style.display = "none";
+      alertsSection.style.display = "none";
+      reportsSection.style.display = "block";
+      updateReportStats();
+    };
+
+    function renderReports() {
+      roadSection.innerHTML = "";
+      if (reports.length === 0) {
+        roadSection.innerHTML = "<p style='color:gray; text-align:center;'>No road issues reported yet.</p>";
+        return;
+      }
+
+      reports.forEach((r, index) => {
+        const isAssigned = r.assignedNgoId === NGO_ID;
+        const card = document.createElement("div");
+        card.className = "report-card";
+        if (isAssigned) card.style.borderLeft = "5px solid #4f46e5";
+
+        card.innerHTML = `
+      <h3>📍 ${r.location} ${isAssigned ? '<span class="badge resolved">ASSIGNED TO YOU</span>' : ''}</h3>
+      <p class="report-info">${r.description || 'No description'}</p>
+      ${r.image ? `<img src="${r.image}">` : ''}
+      <span class="status ${r.status}">${r.status.toUpperCase()}</span>
+      <div class="actions">
+        ${r.status === "pending" ? `
+          <button class="verify-btn" onclick="updateStatus('${r.id}', 'verified')">Verify</button>
+          <button class="reject-btn" onclick="updateStatus('${r.id}', 'rejected')">Reject</button>
+        ` : ""}
+        ${r.status === "verified" ? `
+          <button class="resolve-btn" onclick="updateStatus('${r.id}', 'resolved')">Mark Resolved</button>
+        ` : ""}
+      </div>
+    `;
+        roadSection.appendChild(card);
+      });
+    }
+
+    async function updateStatus(id, newStatus) {
+      try {
+        const response = await fetch(`/api/road-issues/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await response.json();
+        if (data.success) {
+          fetchReports();
+        }
+      } catch (err) {
+        alert("Update failed");
+      }
+    }
+
+    function updateReportStats() {
+      const total = reports.length;
+      const pending = reports.filter(r => r.status === "pending").length;
+      const verified = reports.filter(r => r.status === "verified").length;
+      const resolved = reports.filter(r => r.status === "resolved").length;
+
+      document.getElementById("total").innerText = total;
+      document.getElementById("pending").innerText = pending;
+      document.getElementById("verified").innerText = verified;
+      document.getElementById("resolved").innerText = resolved;
+
+      document.getElementById("progressBar").style.width =
+        total === 0 ? "0%" : Math.round((resolved / total) * 100) + "%";
+    }
+
+    // Initial load
+    fetchReports();
+  </script>
+
+  <script src="lang.js"></script>
+</body>
+
+</html>

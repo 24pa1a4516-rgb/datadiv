@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title data-i18n="otp_verify">OTP Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #3681bf, #08b542);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+
+    .otp-box {
+      background: #fff;
+      padding: 30px;
+      width: 320px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 20px;
+      text-align: center;
+      letter-spacing: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e11a21;
+    }
+
+    .error {
+      color: rgb(89, 231, 144);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="otp-box">
+    <h2 data-i18n="enter_otp">Enter OTP</h2>
+
+    <input type="text" id="otp" data-i18n="otp_placeholder" placeholder="4-digit OTP" maxlength="4" inputmode="numeric">
+
+    <button onclick="verifyOTP()" data-i18n="verify_otp">Verify OTP</button>
+
+    <p class="error" id="error"></p>
+  </div>
+  <script src="lang.js"></script>
+  <script src="otp.js"></script>
+
+
+</body>
+
+</html>

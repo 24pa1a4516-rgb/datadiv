@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Nearby Transporters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f8f9;
+    }
+
+    .header {
+      background: white;
+      padding: 15px 30px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .container {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: white;
+      padding: 20px;
+      border-right: 1px solid #e5e7eb;
+      min-height: calc(100vh - 70px);
+    }
+
+    .sidebar div {
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .sidebar .active {
+      background: #ecfdf5;
+      color: green;
+      font-weight: bold;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .transporter-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .available {
+      background: #dcfce7;
+      color: green;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .info {
+      margin-top: 10px;
+      color: #555;
+    }
+
+    .cost-box {
+      background: #f9fafb;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .call-btn {
+      border: 1px solid #cbd5e1;
+      background: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: black;
+    }
+
+    .pickup-btn {
+      flex: 1;
+      background: #0aa635;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h2 data-i18n="farmer_dashboard">Farmer Dashboard</h2>
+    <p data-i18n="nearby_transporters">Nearby Transporters</p>
+  </div>
+
+  <div class="container">
+
+    <div class="sidebar">
+      <a href="farmer.html" data-i18n="my_crops">🌱 My Crops</a>
+      <div href="community.html" data-i18n="community">👨‍🌾 Community</div>
+      <a class="active" data-i18n="transporters">🚚 Transporters</a>
+    </div>
+
+
+    <div class="main">
+      <h2 data-i18n="nearby_transporters">Nearby Transporters</h2>
+      <p data-i18n="gps_info">Find GPS-based nearby transporters</p>
+
+      <div id="transportersList">
+        <p id="loadingMsg" style="color:gray; text-align:center; padding: 20px;">Searching for available transporters...
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="lang.js"></script>
+  <script>
+    const socket = io();
+    const phone = localStorage.getItem("phone") || "0000000000";
+    const farmerId = "farmer_" + phone;
+
+    socket.on("connect", () => {
+      console.log("Connected to backend as:", farmerId);
+      socket.emit("join", { userId: farmerId, role: "farmer" });
+    });
+
+    async function loadTransporters() {
+      // Try to get GPS
+      let lat = 17.3850, lng = 78.4867; // Defaults
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          lat = pos.coords.latitude;
+          lng = pos.coords.longitude;
+          await fetchTransporters(lat, lng);
+        }, async () => {
+          await fetchTransporters(lat, lng); // Use defaults if GPS fails
+        });
+      } else {
+        await fetchTransporters(lat, lng);
+      }
+    }
+
+    async function fetchTransporters(lat, lng) {
+      try {
+        const res = await fetch(`/api/nearby-transporters?lat=${lat}&lng=${lng}`);
+        const transporters = await res.json();
+
+        const list = document.getElementById("transportersList");
+        const loading = document.getElementById("loadingMsg");
+        if (loading) loading.remove();
+
+        if (transporters.length === 0) {
+          list.innerHTML = `<p style="text-align:center; color:gray; padding:20px;">No transporters available right now.</p>`;
+          return;
+        }
+
+        list.innerHTML = "";
+        transporters.forEach(t => {
+          const card = `
+            <div class="transporter-card">
+              <div class="card-top">
+                <h3>${t.name || "Transporter"}</h3>
+                <span class="available" style="color: ${t.status === 'AVAILABLE' ? 'green' : 'red'}">${t.status}</span>
+              </div>
+              <div class="info">📍 ${t.distance} km away | ⭐ 4.8</div>
+              <div class="info">🚚 ${t.truckType} | 📦 Capacity: ${t.capacity} quintals</div>
+              <div class="info">🚩 Plate: ${t.plateNumber} | 📍 ${t.baseLocation || "Nearby"}</div>
+              <div class="actions">
+                <a href="tel:${t.phone}" class="call-btn">📞 Call</a>
+                <button class="pickup-btn" onclick="requestPickup('${t.id}', '${t.name}', ${lat}, ${lng})">
+                  Request Pickup
+                </button>
+              </div>
+            </div>
+          `;
+          list.insertAdjacentHTML("beforeend", card);
+        });
+      } catch (err) {
+        console.error("Load Error:", err);
+      }
+    }
+
+    function requestPickup(transporterId, name, lat, lng) {
+      // Send real socket event to backend
+      socket.emit("requestTransport", {
+        farmerId: farmerId,
+        transporterId: transporterId,
+        crop: "Wheat",
+        quantity: 20,
+        lat: lat,
+        lng: lng
+      });
+      alert("Pickup request sent to " + name + "! Waiting for confirmation...");
+    }
+
+    // Load on start
+    loadTransporters();
+  </script>
+</body>
+
+</html>

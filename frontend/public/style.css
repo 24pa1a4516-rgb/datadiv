@@ -1,0 +1,135 @@
+/* =========================
+   GLOBAL RESET (SAFE)
+   ========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================
+   BODY (NO LAYOUT CHANGE)
+   ========================= */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f7fa;
+  color: #222;
+  line-height: 1.5;
+}
+
+/* =========================
+   HEADINGS (SAFE)
+   ========================= */
+h1, h2, h3, h4 {
+  margin: 10px 0;
+  font-weight: 600;
+}
+
+/* =========================
+   BUTTONS (KEEP DEFAULT LOOK)
+   ========================= */
+button {
+  padding: 8px 16px;
+  margin: 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #eaeaea;
+}
+
+/* =========================
+   INPUT FIELDS
+   ========================= */
+input, select {
+  padding: 8px;
+  margin: 6px 0;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* =========================
+   LINKS
+   ========================= */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =========================
+   CONTAINERS (OPTIONAL)
+   ========================= */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  padding: 15px;
+}
+
+/* =========================
+   CARDS (OPTIONAL – USE ONLY IF ALREADY PRESENT)
+   ========================= */
+.card {
+  background-color: #fff;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* =========================
+   TABLES (MARKET / DATA PAGES)
+   ========================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+table th {
+  background-color: #e9ecef;
+}
+
+/* =========================
+   NAV / HEADER (SAFE)
+   ========================= */
+header, nav {
+  padding: 10px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+/* =========================
+   FOOTER (OPTIONAL)
+   ========================= */
+footer {
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+/* =========================
+   RESPONSIVE (DOES NOT BREAK UI)
+   ========================= */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+  }
+}

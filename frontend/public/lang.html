@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Select Language</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    .language {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #0a1a5e;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .check {
+      width: 22px;
+      height: 22px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+    }
+
+    .language.selected .check {
+      background: #4caf50;
+      border-color: #4caf50;
+    }
+
+    .language.selected .check::after {
+      content: "✓";
+      color: white;
+      display: flex;
+      justify-content: center;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Select Language</h2>
+
+    <!-- Languages -->
+    <div class="language" data-lang="English">
+      <div class="left">
+        <div class="icon">A</div>English
+      </div>
+      <div class="check"></div>
+    </div>
+
+    <div class="language" data-lang="Hindi">
+      <div class="left">
+        <div class="icon">हि</div>Hindi
+      </div>
+      <div class="check"></div>
+    </div>
+
+    <div class="language" data-lang="Kannada">
+      <div class="left">
+        <div class="icon">ಕ</div>Kannada
+      </div>
+      <div class="check"></div>
+    </div>
+
+    <div class="language" data-lang="Tamil">
+      <div class="left">
+        <div class="icon">த</div>Tamil
+      </div>
+      <div class="check"></div>
+    </div>
+
+    <div class="language" data-lang="Telugu">
+      <div class="left">
+        <div class="icon">తె</div>Telugu
+      </div>
+      <div class="check"></div>
+    </div>
+
+
+    <div class="language" data-lang="Malayalam">
+      <div class="left">
+        <div class="icon">മ</div>Malayalam
+      </div>
+      <div class="check"></div>
+    </div>
+
+    <button id="proceed" disabled>PROCEED</button>
+  </div>
+
+  <script>
+    let selectedLang = "";
+
+    document.querySelectorAll(".language").forEach(lang => {
+      lang.addEventListener("click", () => {
+        document.querySelectorAll(".language")
+          .forEach(l => l.classList.remove("selected"));
+
+        lang.classList.add("selected");
+        selectedLang = lang.dataset.lang;
+        document.getElementById("proceed").disabled = false;
+      });
+    });
+
+    document.getElementById("proceed").addEventListener("click", () => {
+      localStorage.setItem("appLanguage", selectedLang);
+      window.location.href = "login.html"; // Go to login page instead of homepage
+    });
+  </script>
+
+</body>
+
+</html>

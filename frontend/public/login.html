@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #43cea2, #185a9d);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-box {
+      background: white;
+      padding: 30px;
+      width: 300px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #185a9d;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="login-box">
+    <h2 id="title" data-i18n="users_login">Users Login</h2>
+
+    <input type="tel" id="phone" data-i18n="phone_placeholder" placeholder="Enter Mobile Number">
+
+    <button id="loginBtn" data-i18n="proceed">Proceed</button>
+
+    <p id="otpText" style="font-size:12px;color:gray;" data-i18n="otp_text">
+      OTP will be sent to your number
+    </p>
+    <div id="statusMessage" style="margin-top: 15px; font-weight: bold; color: #185a9d; min-height: 1.5em;"></div>
+  </div>
+
+
+  <script src="lang.js"></script>
+  <script src="login.js"></script>
+</body>
+
+</html>

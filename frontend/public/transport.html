@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Vehicle Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f6fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 420px;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 15px;
+      border-radius: 50%;
+      background: #e7efff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon img {
+      width: 32px;
+    }
+
+    h2 {
+      margin: 10px 0;
+      font-size: 22px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #d0d7e2;
+      font-size: 14px;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: #1e5bff;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 14px;
+      background: #1e5bff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1747c8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <div class="icon">
+      <!-- Truck icon (SVG) -->
+      <img src="https://cdn-icons-png.flaticon.com/512/743/743007.png" alt="truck">
+    </div>
+
+    <h2 data-i18n="vehicle_details">Vehicle Details</h2>
+    <p class="subtitle" data-i18n="vehicle_info_desc">Enter your vehicle information to get started</p>
+
+    <div class="form-group">
+      <label data-i18n="vehicle_type">Vehicle Type *</label>
+      <select id="vehicleType">
+        <option value="" data-i18n="select_vehicle_type">Select vehicle type</option>
+        <option data-i18n="mini_truck">Mini Truck</option>
+        <option data-i18n="truck">Truck</option>
+        <option data-i18n="tractor">Tractor</option>
+        <option data-i18n="pickup_van">Pickup Van</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label data-i18n="capacity">Capacity *</label>
+      <select id="capacity">
+        <option value="" data-i18n="select_capacity">Select capacity</option>
+        <option value="1" data-i18n="1_ton">1 Ton</option>
+        <option value="2" data-i18n="2_tons">2 Tons</option>
+        <option value="5" data-i18n="5_tons">5 Tons</option>
+        <option value="10" data-i18n="10_tons">10 Tons</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label data-i18n="plate_number">Plate Number *</label>
+      <input type="text" id="plate" data-i18n="plate_placeholder" placeholder="e.g., MH12AB1234">
+    </div>
+
+    <div class="form-group">
+      <label data-i18n="location">Location *</label>
+      <input type="text" id="location" data-i18n="location_placeholder" placeholder="e.g., Rampur Village, Warangal">
+    </div>
+
+    <button onclick="submitVehicle()" data-i18n="continue_to_dashboard">Continue to Dashboard</button>
+  </div>
+
+  <script src="lang.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="transport.js"></script>
+
+</body>
+
+</html>

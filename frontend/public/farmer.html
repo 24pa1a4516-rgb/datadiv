@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Farmer</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+  <h2 data-translate>Farmer Dashboard</h2>
+
+  <!-- YOUR EXISTING FARMER UI -->
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f6f8f9;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      padding: 15px 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h2 {
+      margin: 0;
+    }
+
+    .header p {
+      margin: 4px 0 0;
+      color: gray;
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: white;
+      padding: 20px;
+      border-right: 1px solid #e5e7eb;
+      min-height: calc(100vh - 70px);
+    }
+
+    .sidebar a,
+    .sidebar div {
+      display: block;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      color: black;
+    }
+
+    .sidebar a:hover,
+    .sidebar div:hover {
+      background: #f3f4f6;
+    }
+
+    .sidebar .active {
+      background: #ecfdf5;
+      color: green;
+      font-weight: bold;
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .add-btn {
+      background: #0aa635;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Empty state */
+    #emptyState {
+      margin-top: 60px;
+      background: white;
+      padding: 60px;
+      text-align: center;
+      border-radius: 12px;
+    }
+
+    /* Crop list */
+    #cropList {
+      display: none;
+      margin-top: 30px;
+    }
+
+    /* Crop card */
+    .crop-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .crop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      background: #fef3c7;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .crop-info {
+      margin-top: 8px;
+      color: #444;
+    }
+
+    .ready {
+      background: #ecfdf5;
+      color: green;
+      padding: 10px;
+      margin-top: 12px;
+      border-radius: 8px;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: red;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px;
+      width: 360px;
+      border-radius: 12px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .modal-content input,
+    .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 12px;
+    }
+  </style>
+  </head>
+
+  <body>
+
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h2 data-i18n="farmer_dashboard">Farmer Dashboard</h2>
+        <p><span data-i18n="welcome">Welcome back</span>, <b id="welcomeName"></b></p>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="active" data-i18n="my_crops">🌱 My Crops</div>
+        <a href="community.html" data-i18n="community">community</a>
+        <a href="transporters.html" data-i18n="transporters">🚚 Transporters</a>
+
+
+      </div>
+
+      <!-- Main -->
+      <div class="main">
+        <div class="top-bar">
+          <div>
+            <h3 data-i18n="my_crops">My Crops</h3>
+            <p data-i18n="start_adding">Manage your plantation and harvest schedule</p>
+          </div>
+          <button class="add-btn" onclick="openModal()" data-i18n="add_crop">+ Add Crop</button>
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState">
+          <h3 data-i18n="no_crops">No crops yet</h3>
+          <p data-i18n="start_adding">Start by adding your first crop</p>
+          <button class="add-btn" onclick="openModal()" data-i18n="add_crop">+ Add Crop</button>
+        </div>
+
+        <!-- Crop list -->
+        <div id="cropList"></div>
+      </div>
+    </div>
+    <script src="lang.js"></script>
+
+    <!-- Modal -->
+    <div class="modal" id="cropModal">
+      <div class="modal-content">
+        <h3 data-i18n="add_new_crop">Add New Crop</h3>
+
+        <select id="cropType">
+          <option value="" data-i18n="select_crop">Select crop type</option>
+          <option>Wheat</option>
+          <option>Rice</option>
+          <option>Corn</option>
+          <option>Barley</option>
+          <option>Soybean</option>
+          <option>Cotton</option>
+          <option>Sugarcane</option>
+          <option>Potato</option>
+          <option>Tomato</option>
+          <option>Onion</option>
+        </select>
+
+        <input type="date" id="harvestDate">
+        <input type="number" id="quantity" data-i18n="quantity_placeholder" placeholder="Quantity (quintals)">
+        <input type="text" id="location" data-i18n="location_placeholder" placeholder="Location">
+
+        <div class="modal-actions">
+          <button onclick="closeModal()" data-i18n="cancel">Cancel</button>
+          <button class="add-btn" onclick="addCrop()" data-i18n="add_crop">Add Crop</button>
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const farmerId = "farmer123";
+
+      socket.emit("join", farmerId);
+
+      socket.on("requestAccepted", (data) => {
+        alert(data.message);
+      });
+      <script>
+        const username = localStorage.getItem("username");
+
+        document.getElementById("welcomeName").innerText =
+        username ? username.toUpperCase() : "USER";
+
+        function openModal() {
+          document.getElementById("cropModal").style.display = "flex";
+}
+
+        function closeModal() {
+          document.getElementById("cropModal").style.display = "none";
+}
+
+        function addCrop() {
+  const type = document.getElementById("cropType").value;
+        const harvest = document.getElementById("harvestDate").value;
+        const qty = document.getElementById("quantity").value;
+        const loc = document.getElementById("location").value;
+
+        if (type === "" || harvest === "" || qty === "" || loc === "") {
+          alert("Please fill all fields");
+        return;
+  }
+
+        document.getElementById("emptyState").style.display = "none";
+        document.getElementById("cropList").style.display = "block";
+
+        const card = document.createElement("div");
+        card.className = "crop-card";
+
+        card.innerHTML = `
+        <div class="crop-header">
+          <h3>${type}</h3>
+          <button class="delete-btn" onclick="deleteCrop(this)">🗑️</button>
+        </div>
+        <span class="badge">Growing</span>
+        <div class="crop-info">📍 ${loc}</div>
+        <div class="crop-info">📦 ${qty} quintals</div>
+        <div class="crop-info">📅 Harvest: ${harvest}</div>
+
+  `;
+
+  document.getElementById("cropList").appendChild(card);
+
+  closeModal();
+
+  document.getElementById("cropType").value = "";
+  document.getElementById("harvestDate").value = "";
+  document.getElementById("quantity").value = "";
+  document.getElementById("location").value = "";
+}
+
+function deleteCrop(btn) {
+  btn.closest(".crop-card").remove();
+
+  if (document.getElementById("cropList").children.length === 0) {
+    document.getElementById("cropList").style.display = "none";
+    document.getElementById("emptyState").style.display = "block";
+  }
+}
+    </script>
+
+    </script>
+
+    <script src="farmer.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+  </body>
+
+</html>

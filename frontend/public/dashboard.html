@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+  <h2 data-translate>Dashboard</h2>
+
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Transporter Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: #f6f8fb;
+      }
+
+      /* HEADER */
+      .header {
+        background: white;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+      }
+
+      .header h2 {
+        margin: 0;
+      }
+
+      .header p {
+        margin: 4px 0 0;
+        color: gray;
+      }
+
+      .header-icons {
+        display: flex;
+        gap: 20px;
+        font-size: 20px;
+      }
+
+      /* MAIN LAYOUT */
+      .container {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+        height: calc(100vh - 80px);
+        /* Fill screen below header */
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 230px;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        height: fit-content;
+      }
+
+      .menu-item {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .menu-item.active {
+        background: #eef4ff;
+        color: #1e5bff;
+        font-weight: bold;
+      }
+
+      /* MAIN CONTENT */
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* STATS */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .stat-card h4 {
+        margin: 0;
+        color: gray;
+        font-size: 13px;
+      }
+
+      .stat-card h3 {
+        margin: 8px 0 0;
+        font-size: 18px;
+      }
+
+      /* SECTION & MAP */
+      .content-view {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        flex: 1;
+        overflow-y: auto;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      #mapView {
+        display: none;
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+        border-radius: 12px;
+      }
+
+      .map-overlay {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      /* REQUESTS */
+      .request-card {
+        background: #f7f9fc;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+      }
+
+      .request-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .badge {
+        background: #fff3c4;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+      }
+
+      .info {
+        margin: 10px 0;
+        color: gray;
+        font-size: 14px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .btn-confirm {
+        flex: 1;
+        background: #1e5bff;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .btn-skip {
+        flex: 1;
+        background: white;
+        border: 1px solid #ccc;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div class="header">
+      <div>
+        <h2 data-i18n="transporter_dashboard">Transporter Dashboard</h2>
+        <p><span data-i18n="welcome">Welcome back</span>, <span id="username"></span></p>
+      </div>
+      <div class="header-icons">
+        🔔 <span style="cursor:pointer" onclick="location.href='homepage.html'">🏠</span>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="container">
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="menu-item active" id="menuRequests" onclick="showView('requests')">
+          <span>📦</span> <span data-i18n="pickup_requests">Pickup Requests</span>
+        </div>
+        <div class="menu-item" id="menuRoute" onclick="showView('route')">
+          <span>🧭</span> <span data-i18n="route_optimization">Route Optimization</span>
+        </div>
+        <div class="menu-item" id="analyticsBtn">
+          <span>📊</span> <span data-i18n="analytics">Analytics</span>
+        </div>
+        <div class="menu-item" id="problems" onclick="location.href='report-problem.html'">
+          <span>⚠</span> <span data-i18n="problems">Problems</span>
+        </div>
+      </div>
+      <script>
+        // Real-time Road Issue Notifications for Transporters
+        socket.on("newRoadIssue", (data) => {
+          console.log("Road Issue Notification:", data);
+          // Simple alert for now, can be improved to a toast
+          alert(`📢 ROAD ALERT: ${data.description}\nLocation: ${data.location}\nStay safe!`);
+        });
+      </script>
+
+      <!-- MAIN -->
+      <div class="main">
+
+        <!-- STATS -->
+        <div class="stats">
+          <div class="stat-card">
+            <h4>Total Trips</h4>
+            <h3 id="stat-trips">0</h3>
+          </div>
+          <div class="stat-card">
+            <h4>Crops Transported</h4>
+            <h3 id="stat-quantity">0 <small>quintals</small></h3>
+          </div>
+          <div class="stat-card">
+            <h4>Revenue Earned</h4>
+            <h3 id="stat-revenue">₹0</h3>
+          </div>
+          <div class="stat-card">
+            <h4>Live Status</h4>
+            <h3 id="stat-status" style="color:#34c38f">Online</h3>
+          </div>
+        </div>
+
+        <!-- REQUESTS VIEW -->
+        <div id="requestsView" class="content-view">
+          <h3>Pickup Requests</h3>
+          <p style="color:gray">Manage your pickup requests and deliveries</p>
+          <div id="requestsList">
+            <p id="noRequests" style="color:gray; text-align:center; padding: 20px;">No pending requests found.</p>
+          </div>
+        </div>
+
+        <!-- ROUTE OPTIMIZATION VIEW -->
+        <div id="mapView" class="content-view">
+          <div class="map-overlay">
+            <strong>Optimized Route</strong>
+            <p id="routeInfo" style="margin:5px 0; font-size:12px; color:gray">Calculating shortest path...</p>
+            <button onclick="recalculateRoute()"
+              style="padding:5px 10px; font-size:12px; background:#1e5bff; color:white; border:none; border-radius:4px; cursor:pointer">Recalculate</button>
+          </div>
+          <div id="map"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // --- UI LOGIC ---
+      function showView(view) {
+        document.getElementById('requestsView').style.display = view === 'requests' ? 'block' : 'none';
+        document.getElementById('mapView').style.display = view === 'route' ? 'flex' : 'none';
+
+        document.getElementById('menuRequests').classList.toggle('active', view === 'requests');
+        document.getElementById('menuRoute').classList.toggle('active', view === 'route');
+
+        if (view === 'route') {
+          setTimeout(() => map.invalidateSize(), 100);
+        }
+      }
+
+      // --- MAP LOGIC ---
+      let map, transporterMarker, routingControl;
+      let requestMarkers = [];
+      let currentLoc = [17.3850, 78.4867]; // Default Hyderabad
+
+      function initMap() {
+        map = L.map('map').setView(currentLoc, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        transporterMarker = L.marker(currentLoc, {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(map).bindPopup("<b>You (Transporter)</b>");
+      }
+
+      initMap();
+
+      function updateTransporterOnMap(lat, lng) {
+        currentLoc = [lat, lng];
+        if (transporterMarker) {
+          transporterMarker.setLatLng(currentLoc);
+          map.panTo(currentLoc);
+        }
+      }
+
+      function addRequestToMap(data) {
+        // Randomly simulate a location near user for demo if not provided
+        const lat = data.lat || (currentLoc[0] + (Math.random() - 0.5) * 0.02);
+        const lng = data.lng || (currentLoc[1] + (Math.random() - 0.5) * 0.02);
+
+        const marker = L.marker([lat, lng], {
+          icon: L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          })
+        }).addTo(map).bindPopup(`<b>Pickup Request</b><br>Crop: ${data.crop}<br>Qty: ${data.quantity} kg`);
+
+        requestMarkers.push({ id: data.requestId, marker: marker });
+        recalculateRoute();
+      }
+
+      function recalculateRoute() {
+        if (routingControl) map.removeControl(routingControl);
+
+        const waypoints = [L.latLng(currentLoc[0], currentLoc[1])];
+        requestMarkers.forEach(rm => waypoints.push(rm.marker.getLatLng()));
+
+        if (waypoints.length < 2) {
+          document.getElementById('routeInfo').innerText = "Add pickup requests to see route.";
+          return;
+        }
+
+        routingControl = L.Routing.control({
+          waypoints: waypoints,
+          routeWhileDragging: false,
+          addWaypoints: false,
+          show: false, // Don't show the text directions
+          lineOptions: { styles: [{ color: '#1e5bff', weight: 6 }] }
+        }).addTo(map);
+
+        routingControl.on('routesfound', function (e) {
+          const routes = e.routes;
+          const summary = routes[0].summary;
+          document.getElementById('routeInfo').innerText = `Dist: ${(summary.totalDistance / 1000).toFixed(1)} km · Time: ${Math.round(summary.totalTime / 60)} min`;
+        });
+      }
+
+      // --- BACKEND CONNECTION ---
+      const socket = io();
+      const name = localStorage.getItem("username") || "Transporter";
+      document.getElementById("username").innerText = name;
+
+      document.getElementById("analyticsBtn").addEventListener("click", () => window.location.href = "analytics.html");
+
+      const phone = localStorage.getItem("phone") || "User";
+      const TRANSPORTER_ID = localStorage.getItem("userId") || "transporter_" + phone;
+
+      socket.on("connect", () => {
+        console.log("Connected to backend!");
+        socket.emit("join", { userId: TRANSPORTER_ID, role: "transporter" });
+
+        if (navigator.geolocation) {
+          navigator.geolocation.watchPosition((pos) => {
+            const { latitude, longitude } = pos.coords;
+            updateTransporterOnMap(latitude, longitude);
+            socket.emit("locationUpdate", {
+              lat: latitude,
+              lng: longitude,
+              capacity: Number(localStorage.getItem("capacity")) || 2000,
+              status: "AVAILABLE"
+            });
+          });
+        }
+      });
+
+      socket.on("newRequest", (data) => {
+        console.log("New Request Received:", data);
+        addRequestCard(data);
+        addRequestToMap(data);
+      });
+
+      function addRequestCard(data) {
+        const container = document.getElementById('requestsList');
+        const noReq = document.getElementById('noRequests');
+        if (noReq) noReq.remove();
+
+        // Check if this request was already accepted by this transporter
+        const isAccepted = data.status === "ACCEPTED";
+
+        const cardHtml = `
+          <div class="request-card" id="req-${data.requestId}">
+            <div class="request-header">
+                <strong>📍 ${isAccepted ? 'Active Order' : 'New Request'}</strong>
+                <span class="badge" style="background: ${isAccepted ? '#dcfce7' : '#fff3c4'}">${isAccepted ? 'Accepted' : 'New'}</span>
+            </div>
+            <h4>Farmer: ${data.farmerName || data.farmerId}</h4>
+            <p class="info">${data.crop || 'Crop'} · 📦 ${data.quantity} kg</p>
+            <div class="actions">
+                ${!isAccepted ?
+            `<button class="btn-confirm" onclick="acceptRequest('${data.requestId}')">✔ Confirm</button>
+                   <button class="btn-skip" onclick="removeCard('${data.requestId}')">✖ Skip</button>`
+            :
+            `<button class="btn-confirm" style="background:#2e7d32" onclick="completeOrder('${data.requestId}')">🏁 Mark Completed</button>`
+          }
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('afterbegin', cardHtml);
+      }
+
+      window.acceptRequest = function (requestId) {
+        socket.emit("acceptRequest", { requestId, transporterId: TRANSPORTER_ID });
+        // Update UI immediately to show "Complete" button
+        const card = document.getElementById(`req-${requestId}`);
+        if (card) {
+          card.querySelector('.badge').innerText = "Accepted";
+          card.querySelector('.badge').style.background = "#dcfce7";
+          card.querySelector('.actions').innerHTML = `<button class="btn-confirm" style="background:#2e7d32" onclick="completeOrder('${requestId}')">🏁 Mark Completed</button>`;
+        }
+        alert("Accepted! Delivering order now.");
+      };
+
+      window.completeOrder = function (requestId) {
+        if (confirm("Are you sure you have completed this delivery?")) {
+          socket.emit("completeRequest", { requestId, transporterId: TRANSPORTER_ID });
+          const card = document.getElementById(`req-${requestId}`);
+          if (card) card.remove();
+          alert("Order completed! Stats updated in Analytics.");
+        }
+      };
+
+      window.removeCard = function (requestId) {
+        const card = document.getElementById(`req-${requestId}`);
+        if (card) card.remove();
+        requestMarkers = requestMarkers.filter(rm => {
+          if (rm.id === requestId) {
+            map.removeLayer(rm.marker);
+            return false;
+          }
+          return true;
+        });
+        recalculateRoute();
+      };
+    </script>
+    <script src="lang.js"></script>
+    <script src="/js/lang.js"></script>
+  </body>
+
+  </html>
