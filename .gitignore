@@ -1,0 +1,11 @@
+node_modules/
+**/node_modules/
+.env
+fresh_tunnel.txt
+*.log
+.gemini/
+.agent/
+brain/
+firebase_key.json
+mobile/node_modules/
+serviceAccountKey.json
